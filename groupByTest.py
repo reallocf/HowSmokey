@@ -41,22 +41,32 @@ if __name__ == "__main__":
     number_of_rows = 10
     cardinality = 5
     table = generateTable(number_of_rows, cardinality)
-    table = [0, 0, 1, 1, 1, 0, 1, 0, 0, 1, 3, 3, 1]
+
+    #The example we used in our paper
+    table = [1, 1, 2, 2, 2, 1, 2, 1, 1, 2, 4, 4, 1]
 
     smoke_forward_lineage = []
     smoke_backward_lineage = []
 
     lineage_matrix = []   # How Smokey?'s representation of lineage
-    for i in range(cardinality):
-        lineage_matrix.append([])
-        smoke_backward_lineage.append([])
+    seen = {}
+    output_column_count = 0
 
     for rid, tuple in enumerate(table):
-        smoke_forward_lineage.append([tuple])
+        if tuple not in seen:
+            seen[tuple] = output_column_count
+            smoke_backward_lineage.append([])
+            output_column_count += 1
+        smoke_forward_lineage.append([seen[tuple]])
+        smoke_backward_lineage[seen[tuple]].append(rid)
+
+    for i in range(output_column_count):
+        lineage_matrix.append([])
+
+    for rid, tuple in enumerate(table):
         for col_index, col in enumerate(lineage_matrix):
-            if col_index is tuple:
+            if col_index is seen[tuple]:
                 col.append(1)
-                smoke_backward_lineage[col_index].append(rid)
             else:
                 col.append(0)
 
