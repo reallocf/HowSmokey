@@ -1,6 +1,7 @@
 import random
 import math
 
+
 def pretty_print_lineage_matrix(lineage_matrix):
     transposed_lineage = [[lineage_matrix[j][i] for j in range(len(lineage_matrix))] for i in range(len(lineage_matrix[0]))]
     for col in transposed_lineage:
@@ -8,6 +9,7 @@ def pretty_print_lineage_matrix(lineage_matrix):
         for tuple in col:
             str_array.append(str(tuple))
         print(' '.join(str_array))
+
 
 def calculate_theoretical_size(lineage):
     max_numbers = []
@@ -20,14 +22,12 @@ def calculate_theoretical_size(lineage):
     bit_per_element = int (math.log(max_number, 2)) + 1
     return bit_per_element * number_of_elements
 
-    #print(max_number)
 
-
-def generateTable(numberOfRows, cardinality):
+def generateTable(number_or_rows, cardinality):
     ret = []
     contains_all_numbers = False
     while not contains_all_numbers:
-        for i in range(numberOfRows):
+        for i in range(number_or_rows):
             ret.append(random.randint(0, cardinality - 1))
         contains_all_numbers = True
         for i in range(cardinality):
@@ -37,12 +37,13 @@ def generateTable(numberOfRows, cardinality):
             ret = []
     return ret
 
+
 if __name__ == "__main__":
     number_of_rows = 10
     cardinality = 5
     table = generateTable(number_of_rows, cardinality)
 
-    #The example we used in our paper
+    # The example we used in our paper
     table = [1, 1, 2, 2, 2, 1, 2, 1, 1, 2, 4, 4, 1]
 
     smoke_forward_lineage = []
@@ -52,6 +53,7 @@ if __name__ == "__main__":
     seen = {}
     output_column_count = 0
 
+    # Generate lineage representations for Smoke
     for rid, tuple in enumerate(table):
         if tuple not in seen:
             seen[tuple] = output_column_count
@@ -60,6 +62,7 @@ if __name__ == "__main__":
         smoke_forward_lineage.append([seen[tuple]])
         smoke_backward_lineage[seen[tuple]].append(rid)
 
+    # Generate lineage matrix
     for i in range(output_column_count):
         lineage_matrix.append([])
 
@@ -70,15 +73,15 @@ if __name__ == "__main__":
             else:
                 col.append(0)
 
-
     print("Input tuples")
     print(table)
     print
-    #calculate_theoretical_size(lineage_matrix)
+    print("Smoke forward lineage")
     print(smoke_forward_lineage)
     forward_lineage_size = calculate_theoretical_size(smoke_forward_lineage)
     print("Smoke forward lineage size: " + str(forward_lineage_size))
     print
+    print("Smoke backward lineage")
     print(smoke_backward_lineage)
     backward_lineage_size = calculate_theoretical_size(smoke_backward_lineage)
     print("Smoke backward lineage size: " + str(backward_lineage_size))
@@ -86,6 +89,6 @@ if __name__ == "__main__":
     print("Smoke total lineage size: " + str(forward_lineage_size + backward_lineage_size))
     print
 
-
+    print("Lineage matrix")
     pretty_print_lineage_matrix(lineage_matrix)
     print("Smokey lineage size: " + str(calculate_theoretical_size(lineage_matrix)))
