@@ -22,7 +22,9 @@ def calculate_theoretical_size(lineage):
             max_numbers.append(max(row))
         number_of_elements += len(row)
     max_number = max(max_numbers)
-    bit_per_element = int (math.log(max_number, 2)) + 1
+    bit_per_element = 1
+    if max_number is not 0:
+      bit_per_element = int (math.log(max_number, 2)) + 1
     return rid_size * number_of_elements, bit_per_element * number_of_elements
 
 
