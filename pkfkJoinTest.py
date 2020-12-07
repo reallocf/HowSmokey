@@ -1,3 +1,4 @@
+import csv
 import random
 from helper import getSmallestPossibleBitpack
 
@@ -36,21 +37,20 @@ def buildLineageIndexesInThetaJoin(pkTable, fkTable, pkIdColInPkTable = 0, pkIdC
         outputId += 1
   return lineageMatrix, smokePkForwardLineage, smokeFkForwardLineage, smokePkBackwardLineage, smokeFkBackwardLineage
 
-if __name__ == "__main__":
-  random.seed(123)
-  pkTable, fkTable = generateTables(3, 1000000)
+def runTests(numberOfPkRows, numberOfFkRows):
+  pkTable, fkTable = generateTables(numberOfPkRows, numberOfFkRows)
   lineageMatrix, smokePkForwardLineage, smokeFkForwardLineage, smokePkBackwardLineage, smokeFkBackwardLineage = buildLineageIndexesInThetaJoin(pkTable, fkTable)
   # Print out matrices - messy for large index values
-  print(lineageMatrix)
-  print(smokePkForwardLineage)
-  print(smokeFkForwardLineage)
-  print(smokePkBackwardLineage)
-  print(smokeFkBackwardLineage)
+  #print(lineageMatrix)
+  #print(smokePkForwardLineage)
+  #print(smokeFkForwardLineage)
+  #print(smokePkBackwardLineage)
+  #print(smokeFkBackwardLineage)
   lineageMatrixSize = len(lineageMatrix)
   smokePkIndexSize = sum([len(l) for l in smokePkForwardLineage]) + len(smokePkBackwardLineage)
   smokeFkIndexSize = len(smokeFkForwardLineage) + len(smokeFkBackwardLineage)
   # Lineage Matrix
-  print("Lineage matrix size:", len(lineageMatrix))
+  print("Lineage matrix size:", lineageMatrixSize)
   # Smoke sizes with 64 bit ints
   smokeIndexSize = (smokePkIndexSize + smokeFkIndexSize) * 64
   print("Smoke matrix size:", smokeIndexSize)
@@ -63,3 +63,15 @@ if __name__ == "__main__":
   print("Smallest bitpack Smoke matrix size:", smallestBitpackSmokeIndexSize)
   smallestBitpackSmokeIndexSizeMinusBoringStuff = smokePkIndexSize * smallestBitpack
   print("Smallest bitpack Smoke matrix size only including PK indexes (the interesting ones):", smallestBitpackSmokeIndexSizeMinusBoringStuff)
+  return [numberOfPkRows, lineageMatrixSize, smokeIndexSize, smokeIndexMinusBoringStuff, smallestBitpackSmokeIndexSize, smallestBitpackSmokeIndexSizeMinusBoringStuff]
+
+if __name__ == "__main__":
+  numberOfPkRows = 1
+  resultCSV = []
+  while numberOfPkRows <= 2048:
+    resultCSV.append(runTests(numberOfPkRows, 100000))
+    numberOfPkRows *= 2
+  print(resultCSV)
+  with open("output.csv", "w") as f:
+    writer = csv.writer(f)
+    writer.writerows(resultCSV)
