@@ -51,10 +51,10 @@ def runTests(numberOfPkRows, numberOfFkRows):
   smokeFkIndexSize = len(smokeFkForwardLineage) + len(smokeFkBackwardLineage)
   # Lineage Matrix
   print("Lineage matrix size:", lineageMatrixSize)
-  # Smoke sizes with 64 bit ints
-  smokeIndexSize = (smokePkIndexSize + smokeFkIndexSize) * 64
+  # Smoke sizes with 32 bit ints
+  smokeIndexSize = (smokePkIndexSize + smokeFkIndexSize) * 32
   print("Smoke matrix size:", smokeIndexSize)
-  smokeIndexMinusBoringStuff = smokePkIndexSize * 64
+  smokeIndexMinusBoringStuff = smokePkIndexSize * 32
   print("Smoke matrix size only including PK indexes (the interesting ones):", smokeIndexMinusBoringStuff)
   # Smoke sizes with smallest possible bitpack - highest value will be max row of either pk or fk table
   smallestBitpack = getSmallestPossibleBitpack(max(len(pkTable), len(fkTable)))
@@ -68,10 +68,10 @@ def runTests(numberOfPkRows, numberOfFkRows):
 if __name__ == "__main__":
   numberOfPkRows = 1
   resultCSV = []
-  while numberOfPkRows <= 2048:
-    resultCSV.append(runTests(numberOfPkRows, 100000))
+  while numberOfPkRows <= 256:
+    resultCSV.append(runTests(numberOfPkRows, 1000000))
     numberOfPkRows *= 2
   print(resultCSV)
-  with open("output.csv", "w") as f:
+  with open("output4.csv", "w") as f:
     writer = csv.writer(f)
     writer.writerows(resultCSV)
